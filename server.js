@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -9,7 +8,7 @@ const propertiesRoutes = require('./routes/properties');
 const app = express();
 
 // Connect to MongoDB
-const mongoURI = 'mongodb+srv://stayora_dev_db:7p8YKu7lZ6Qvqyme@cluster0.xvmqwvb.mongodb.net/stayora-db?retryWrites=true&w=majority'; // Replace with your actual MongoDB URI
+const mongoURI = process.env.MONGO_URI || 'mongodb+srv://your-username:your-password@cluster.mongodb.net/stayora-db?retryWrites=true&w=majority'; // Replace with your actual MongoDB URI
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
