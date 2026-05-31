@@ -5,7 +5,12 @@ const citySchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true
+  },
+  image : {
+    type : String,
+    required : false,
+    nullable : true
   }
 });
 
-module.exports = mongoose.model('City', citySchema);
+module.exports = mongoose.model('cities', citySchema);

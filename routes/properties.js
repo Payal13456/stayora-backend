@@ -3,13 +3,182 @@ const Property = require('../models/Property');
 
 const router = express.Router();
 
+/**
+ * GET ALL PROPERTIES
+ * Filters:
+ * ?city=id
+ * ?type=PG
+ * ?genderPreference=Female
+ * ?minPrice=5000
+ * ?maxPrice=10000
+ */
 router.get('/', async (req, res) => {
-  try {
-    const properties = await Property.find();
-    res.json({ properties });
-  } catch (error) {
-    res.status(500).send('Server error');
-  }
+    try {
+        const {
+            city,
+            type,
+            genderPreference,
+            minPrice,
+            maxPrice
+        } = req.query;
+
+        const filter = {};
+
+        if (city) filter.city = city;
+        if (type) filter.type = type;
+        if (genderPreference)
+            filter.genderPreference = genderPreference;
+
+        if (minPrice || maxPrice) {
+            filter.price = {};
+
+            if (minPrice)
+                filter.price.$gte = Number(minPrice);
+
+            if (maxPrice)
+                filter.price.$lte = Number(maxPrice);
+        }
+
+        const properties = await Property.find(filter)
+            .populate('city', 'name image')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: properties.length,
+            data: properties
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+
+/**
+ * GET PROPERTY DETAILS
+ */
+router.get('/:id', async (req, res) => {
+    try {
+
+        const property = await Property.findById(req.params.id)
+            .populate('city', 'name image');
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: property
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+
+/**
+ * CREATE PROPERTY
+ */
+router.post('/add', async (req, res) => {
+    try {
+
+        const property = await Property.create(req.body);
+
+        const populatedProperty = await Property.findById(property._id)
+            .populate('city', 'name image');
+
+        res.status(201).json({
+            success: true,
+            message: 'Property created successfully',
+            data: populatedProperty
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+
+/**
+ * UPDATE PROPERTY
+ */
+router.put('/:id', async (req, res) => {
+    try {
+
+        const property = await Property.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        ).populate('city', 'name image');
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Property updated successfully',
+            data: property
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+
+/**
+ * DELETE PROPERTY
+ */
+router.delete('/:id', async (req, res) => {
+    try {
+
+        const property = await Property.findById(req.params.id);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
+            });
+        }
+
+        await Property.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Property deleted successfully'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 });
 
 module.exports = router;
