@@ -1,55 +1,141 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Student = require('../models/Student');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const Student = require("../models/Student");
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+/**
+ * Register Student
+ * POST /api/auth/register
+ */
+router.post("/register", async (req, res) => {
+  const { name, email, phone, college, password } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).send('Name, email, and password are required');
+  if (!name || !email || !phone || !college || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Name, Email, Phone, College and Password are required",
+    });
   }
 
   try {
-    const existingStudent = await Student.findOne({ email });
+    // Check if email or phone already exists
+    const existingStudent = await Student.findOne({
+      $or: [{ email }, { phone }],
+    });
+
     if (existingStudent) {
-      return res.status(400).send('Student already exists');
+      return res.status(400).json({
+        success: false,
+        message: "Student already exists",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const student = new Student({ name, email, password: hashedPassword });
+
+    const student = new Student({
+      name,
+      email,
+      phone,
+      college,
+      password: hashedPassword,
+    });
+
     await student.save();
 
-    res.status(201).send('Student registered successfully');
+    const token = jwt.sign(
+      {
+        id: student._id,
+        email: student.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Student registered successfully",
+      token,
+      user: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
+        college: student.college,
+      },
+    });
   } catch (error) {
-    res.status(500).send('Server error');
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 });
 
-router.post('/login', async (req, res) => {
+/**
+ * Login Student
+ * POST /api/auth/login
+ */
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send('Email and password are required');
+    return res.status(400).json({
+      success: false,
+      message: "Email and Password are required",
+    });
   }
 
   try {
     const student = await Student.findOne({ email });
+
     if (!student) {
-      return res.status(400).send('Invalid credentials');
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
     const isValid = await bcrypt.compare(password, student.password);
+
     if (!isValid) {
-      return res.status(400).send('Invalid credentials');
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    const token = jwt.sign({ email: student.email, name: student.name }, 'your-secret-key', { expiresIn: '1h' });
-    res.send({ token });
+    const token = jwt.sign(
+      {
+        id: student._id,
+        email: student.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
+        college: student.college,
+      },
+    });
   } catch (error) {
-    res.status(500).send('Server error');
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 });
 
