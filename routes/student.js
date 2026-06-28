@@ -35,6 +35,33 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
+router.get('/all', async(req,res) => {
+  try{
+    const students = await Student.find()
+      .populate("savedProperties")
+      .select("-password");
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message : "Students fetched successfully",
+      data: students,
+    });
+  }catch(error){
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+})
+
 /**
  * PUT /api/student
  * Update logged-in student's profile
@@ -78,5 +105,7 @@ router.put("/", auth, async (req, res) => {
     });
   }
 });
+
+
 
 module.exports = router;
