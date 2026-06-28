@@ -107,12 +107,12 @@ router.put("/", auth, async (req, res) => {
 });
 
 // wishlist property
-router.post("/wishlist/:propertyId", async (req, res) => {
+router.post("/wishlist/:propertyId", auth,  async (req, res) => {
   try {
-    const userId = req.user._id; // from auth middleware
+    const userId = req.user.id; // from auth middleware
     const { propertyId } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await Student.findById(userId);
 
     if (!user) {
       return res.status(404).json({
