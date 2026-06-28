@@ -106,6 +106,40 @@ router.put("/", auth, async (req, res) => {
   }
 });
 
+// wishlist property
+router.post("/wishlist/:propertyId", async (req, res) => {
+  try {
+    const userId = req.user._id; // from auth middleware
+    const { propertyId } = req.params;
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+    // Avoid duplicate wishlist
+    if (user.savedProperties.includes(propertyId)) {
+      return res.status(400).json({
+        message: "Property already in wishlist"
+      });
+    }
+
+    user.savedProperties.push(propertyId);
+    await user.save();
+
+    return res.status(200).json({
+      message: "Property added to wishlist",
+      savedProperties: user.savedProperties
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+});
 
 module.exports = router;

@@ -29,6 +29,6 @@ app.use("/properties", propertiesRoutes);
 app.use("/roommate", roommateRoutes);
 app.use("/student", studentRoutes);
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
