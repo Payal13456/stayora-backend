@@ -7,6 +7,7 @@ const citiesRoutes = require("./routes/cities");
 const propertiesRoutes = require("./routes/properties");
 const roommateRoutes = require("./routes/roommate");
 const studentRoutes = require("./routes/student");
+const notificationsRoutes = require("./routes/notifications");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/cities", citiesRoutes);
 app.use("/properties", propertiesRoutes);
 app.use("/roommate", roommateRoutes);
 app.use("/student", studentRoutes);
+app.use("/notifications", notificationsRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

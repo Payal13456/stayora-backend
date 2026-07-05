@@ -1,5 +1,6 @@
 const express = require('express');
 const Property = require('../models/Property');
+const ScheduledVisit = require('../models/ScheduleVisit');
 
 const router = express.Router();
 
@@ -173,6 +174,34 @@ router.delete('/:id', async (req, res) => {
             message: 'Property deleted successfully'
         });
 
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/schedule-visit', async (req, res) => {
+    try {
+        const { propertyId, userId, date , time } = req.body;
+
+        new ScheduledVisit({
+            property: propertyId,
+            user: userId,
+            date ,
+            time,   
+        }).save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Visit scheduled successfully',
+            data: {
+                propertyId,
+                userId,
+                date
+            }
+        });
     } catch (error) {
         res.status(500).json({
             success: false,

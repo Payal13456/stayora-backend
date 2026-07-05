@@ -134,7 +134,7 @@ router.post("/wishlist/:propertyId", auth,  async (req, res) => {
       message: "Property added to wishlist",
       savedProperties: user.savedProperties
     });
-
+    
   } catch (error) {
     res.status(500).json({
       message: error.message
