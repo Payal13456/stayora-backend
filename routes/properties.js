@@ -186,9 +186,19 @@ router.post('/schedule-visit', async (req, res) => {
     try {
         const { propertyId, userId, date , time } = req.body;
 
+        const property = await ScheduledVisit.find({ property_id: propertyId, requester_id: userId, date , time });
+
+        if (property.length > 0) {
+            console.log("Already scheduled visit found:", property);
+            return res.status(400).json({
+                success: false,
+                message: 'You have already scheduled a visit for this property on this date and time'
+            });
+        }
+
         new ScheduledVisit({
-            property: propertyId,
-            user: userId,
+            property_id: propertyId,
+            requester_id: userId,
             date ,
             time,   
         }).save();
