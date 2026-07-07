@@ -1,6 +1,7 @@
 const express = require('express');
 const Property = require('../models/Property');
 const ScheduledVisit = require('../models/ScheduleVisit');
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -58,35 +59,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-/**
- * GET PROPERTY DETAILS
- */
-router.get('/:id', async (req, res) => {
-    try {
-
-        const property = await Property.findById(req.params.id)
-            .populate('city', 'name image');
-
-        if (!property) {
-            return res.status(404).json({
-                success: false,
-                message: 'Property not found'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: property
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
 
 
 /**
@@ -212,6 +184,54 @@ router.post('/schedule-visit', async (req, res) => {
                 date
             }
         });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.get('/schedule-requests', auth, async (req, res) => {
+  try {
+    const userId = req.user.id; // from auth middleware
+    const scheduledVisits = await ScheduledVisit.find({ requester_id: userId })
+        .populate('property_id', 'name address price images')
+
+    res.status(200).json({
+      success: true,
+      data: scheduledVisits,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
+/**
+ * GET PROPERTY DETAILS
+ */
+router.get('/:id', async (req, res) => {
+    try {
+
+        const property = await Property.findById(req.params.id)
+            .populate('city', 'name image');
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: property
+        });
+
     } catch (error) {
         res.status(500).json({
             success: false,

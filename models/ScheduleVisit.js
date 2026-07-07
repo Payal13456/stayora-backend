@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ScheduleVisitSchema = new Schema({
-  property_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'Property',
-    required: true,
-  },
   requester_id: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
+  },
+  property_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Property',
     required: true,
   },
   date: {
