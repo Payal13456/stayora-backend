@@ -318,7 +318,7 @@ router.get('/owner-schedule-requests', auth, async (req, res) => {
         const userId = req.user.id; // from auth middleware
         const properties = await Property.find({ user_id: userId }).select('_id');
         const propertyIds = properties.map(p => p._id);
-        const scheduledVisits = await ScheduledVisit.find({ property_id: { $in: propertyIds }, date : { $gt: new Date() } })
+        const scheduledVisits = await ScheduledVisit.find({ property_id: { $in: propertyIds } })
             .populate('requester_id', 'name email phone')
             .populate('property_id', 'name address price images');
 
