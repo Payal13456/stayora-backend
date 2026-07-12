@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const ScheduleVisitSchema = new Schema({
   requester_id: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Student',
     required: true,
   },
   property_id: {
