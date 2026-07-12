@@ -162,13 +162,22 @@ router.post('/schedule-visit', async (req, res) => {
     try {
         const { propertyId, userId, date , time } = req.body;
 
-        const property = await ScheduledVisit.find({ property_id: propertyId, requester_id: userId, date , time });
+        const property = await ScheduledVisit.find({ property_id: propertyId, requester_id: userId , status: "pending" });
 
         if (property.length > 0) {
             console.log("Already scheduled visit found:", property);
             return res.status(400).json({
                 success: false,
-                message: 'You have already scheduled a visit for this property on this date and time'
+                message: 'You already have a pending visit request for this property. Please wait for the owner to respond.'
+            });
+        }
+
+        const propertyDetails = await Property.findById(propertyId);
+
+        if (!propertyDetails) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
             });
         }
 
@@ -179,11 +188,13 @@ router.post('/schedule-visit', async (req, res) => {
             time,   
         }).save();
 
+        
+
         // Create notification for property owner
         await Notification.create({
             description: `A user has requested to visit your property on ${date} at ${time}. Please review the request.`,
             sender: userId,
-            receiver: property.user_id, // Replace with your owner field
+            receiver: propertyDetails.user_id, // Replace with your owner field
             status: "unread",
         });
 
@@ -222,6 +233,82 @@ router.get('/schedule-requests', auth, async (req, res) => {
   }
 });
 
+router.get('/owner-schedule-requests', auth, async (req, res) => {
+    try {
+        const userId = req.user.id; // from auth middleware
+        const properties = await Property.find({ user_id: userId }).select('_id');
+        const propertyIds = properties.map(p => p._id);
+        const scheduledVisits = await ScheduledVisit.find({ property_id: { $in: propertyIds }, date : { $gt: new Date() } })
+            .populate('requester_id', 'name email phone')
+            .populate('property_id', 'name address price images');
+
+        res.status(200).json({
+            success: true,
+            data: scheduledVisits,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});
+
+router.post('/schedule-requests/:id/accept', auth, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+        const scheduledVisit = await ScheduledVisit.findById(requestId);
+
+        if (!scheduledVisit) {
+            return res.status(404).json({
+                success: false,
+                message: 'Scheduled visit request not found'
+            });
+        }
+
+        scheduledVisit.status = 'accepted';
+        await scheduledVisit.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Scheduled visit request accepted',
+            data: scheduledVisit
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/schedule-requests/:id/reject', auth, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+        const scheduledVisit = await ScheduledVisit.findById(requestId);
+
+        if (!scheduledVisit) {
+            return res.status(404).json({
+                success: false,
+                message: 'Scheduled visit request not found'
+            });
+        }
+
+        scheduledVisit.status = 'rejected';
+        await scheduledVisit.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Scheduled visit request rejected',
+            data: scheduledVisit
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
 /**
  * GET PROPERTY DETAILS
