@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
         }
 
         if (user_id) filter.user_id = user_id;
-        
+
         const properties = await Property.find(filter)
             .populate('city', 'name image')
             .sort({ createdAt: -1 });
@@ -177,6 +177,14 @@ router.post('/schedule-visit', async (req, res) => {
             date ,
             time,   
         }).save();
+
+        // Create notification for property owner
+        await Notification.create({
+            description: `A user has requested to visit your property on ${date} at ${time}. Please review the request.`,
+            sender: userId,
+            receiver: property.user_id, // Replace with your owner field
+            status: "unread",
+        });
 
         res.status(200).json({
             success: true,
