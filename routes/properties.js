@@ -1,6 +1,7 @@
 const express = require('express');
 const Property = require('../models/Property');
 const ScheduledVisit = require('../models/ScheduleVisit');
+const Notification = require('../models/Notification');
 const auth = require("../middleware/auth");
 
 const router = express.Router();
