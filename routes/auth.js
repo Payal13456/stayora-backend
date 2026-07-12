@@ -40,6 +40,7 @@ router.post("/register", async (req, res) => {
       phone,
       college,
       password: hashedPassword,
+      type: req.body.type || "student",
     });
 
     await student.save();

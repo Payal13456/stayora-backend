@@ -21,7 +21,8 @@ router.get('/', async (req, res) => {
             type,
             genderPreference,
             minPrice,
-            maxPrice
+            maxPrice,
+            user_id
         } = req.query;
 
         const filter = {};
@@ -41,6 +42,8 @@ router.get('/', async (req, res) => {
                 filter.price.$lte = Number(maxPrice);
         }
 
+        if (user_id) filter.user_id = user_id;
+        
         const properties = await Property.find(filter)
             .populate('city', 'name image')
             .sort({ createdAt: -1 });

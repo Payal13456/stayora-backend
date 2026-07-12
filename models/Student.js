@@ -46,6 +46,12 @@ const studentSchema = new mongoose.Schema(
         },
       },
     ],
+
+    type : {
+      type: String,
+      enum: ["student", "admin", "owner"],
+      default: "student",
+    },
   },
   {
     timestamps: true,
