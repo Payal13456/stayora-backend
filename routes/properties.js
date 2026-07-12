@@ -158,6 +158,25 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+router.get('/request-by-property/:propertyId', async (req, res) => {
+    try {
+        const propertyId = req.params.propertyId;
+        
+        const scheduledVisits = await ScheduledVisit.find({ property_id: propertyId });
+
+        res.status(200).json({
+            success: true,
+            data: scheduledVisits
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.post('/schedule-visit', async (req, res) => {
     try {
         const { propertyId, userId, date , time } = req.body;
