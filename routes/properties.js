@@ -349,6 +349,13 @@ router.post('/schedule-requests/:id/accept', auth, async (req, res) => {
         scheduledVisit.status = 'accepted';
         await scheduledVisit.save();
 
+        Notification.create({
+            description: `Your visit request for property ${scheduledVisit.property_id} has been accepted.`,
+            sender: req.user.id,
+            receiver: scheduledVisit.requester_id,
+            status: "unread",
+        });
+
         res.status(200).json({
             success: true,
             message: 'Scheduled visit request accepted',
@@ -376,6 +383,13 @@ router.post('/schedule-requests/:id/reject', auth, async (req, res) => {
 
         scheduledVisit.status = 'rejected';
         await scheduledVisit.save();
+
+        Notification.create({
+            description: `Your visit request for the property on ${scheduledVisit.date} at ${scheduledVisit.time} has been rejected.`,
+            sender: req.user.id, // Assuming the owner is rejecting the request
+            receiver: scheduledVisit.requester_id,
+            status: "unread",
+        });
 
         res.status(200).json({
             success: true,
