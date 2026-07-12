@@ -346,7 +346,7 @@ router.post('/schedule-requests/:id/accept', auth, async (req, res) => {
             });
         }
 
-        scheduledVisit.status = 'accepted';
+        scheduledVisit.status = 'approved';
         await scheduledVisit.save();
 
         Notification.create({
