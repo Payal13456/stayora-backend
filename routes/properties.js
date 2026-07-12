@@ -177,6 +177,67 @@ router.get('/request-by-property/:propertyId', async (req, res) => {
     }
 });
 
+router.post('/reschedule-visit', async (req, res) => {
+    try {
+        const { visitId, newDate, newTime } = req.body;
+        
+        const scheduledVisit = await ScheduledVisit.findById(visitId);
+
+        if (!scheduledVisit) {
+            return res.status(404).json({
+                success: false,
+                message: 'Scheduled visit not found'
+            });
+        }
+        
+        scheduledVisit.date = newDate;
+        scheduledVisit.time = newTime;
+        await scheduledVisit.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Scheduled visit rescheduled successfully',
+            data: scheduledVisit
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/cancel-visit', async (req, res) => {
+    try {
+        const { visitId } = req.body;
+
+        const scheduledVisit = await ScheduledVisit.findById(visitId);
+        
+        if (!scheduledVisit) {
+            return res.status(404).json({
+                success: false,
+                message: 'Scheduled visit not found'
+            });
+        }
+        
+        scheduledVisit.status = 'cancelled';
+        await scheduledVisit.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Scheduled visit cancelled successfully',
+            data: scheduledVisit
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.post('/schedule-visit', async (req, res) => {
     try {
         const { propertyId, userId, date , time } = req.body;
