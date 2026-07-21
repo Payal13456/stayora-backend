@@ -12,11 +12,15 @@ const router = express.Router();
 
 router.post('/add', async (req, res) => {
   try {
+    // add slug and user_id 
+    const slug = req.body.name.toLowerCase().replace(/ /g, '-');
+    req.body.slug = slug;
+
     const roommate = await Roommate.create(req.body);
 
     const data = await Roommate.findById(roommate._id).populate(
       'city',
-      'name image'
+      'name image slug'
     );
 
     return res.status(201).json({
@@ -55,7 +59,8 @@ router.get('/', async (req, res) => {
       occupationType,
       preferredGender,
       minBudget,
-      maxBudget
+      maxBudget,
+      slug
     } = req.query;
 
     const filter = {};
@@ -78,10 +83,14 @@ router.get('/', async (req, res) => {
 
       if (maxBudget)
         filter.budget.$lte = Number(maxBudget);
+
+      if(slug)
+        filter.slug = slug;
     }
+    
 
     const roommates = await Roommate.find(filter)
-      .populate('city', 'name image')
+      .populate('city', 'name image slug')
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -116,7 +125,7 @@ router.get('/search/list', async (req, res) => {
         { occupation: { $regex: q, $options: 'i' } },
         { bio: { $regex: q, $options: 'i' } }
       ]
-    }).populate('city', 'name image');
+    }).populate('city', 'name image slug');
 
     return res.json({
       success: true,
@@ -141,7 +150,7 @@ router.get('/:id', async (req, res) => {
   try {
     const roommate = await Roommate.findById(req.params.id).populate(
       'city',
-      'name image'
+      'name image slug'
     );
 
     if (!roommate) {
@@ -178,7 +187,7 @@ router.put('/:id', async (req, res) => {
         new: true,
         runValidators: true
       }
-    ).populate('city', 'name image');
+    ).populate('city', 'name image slug');
 
     if (!roommate) {
       return res.status(404).json({

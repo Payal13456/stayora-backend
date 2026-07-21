@@ -72,6 +72,16 @@ const roommateSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    slug : {
+        type : String,
+        required : true,
+        unique : true
+    },
+    user_id : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Student',
+        required: true
     }
 
 }, {

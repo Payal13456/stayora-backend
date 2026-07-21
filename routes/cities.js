@@ -56,6 +56,8 @@ router.get('/:id', async (req, res) => {
 router.post('/add', async (req, res) => {
   try {
     const { name, image } = req.body;
+    // add slug generation logic here if needed
+    const slug = name.toLowerCase().replace(/ /g, '-');
 
     const existingCity = await City.findOne({ name });
 
@@ -68,7 +70,8 @@ router.post('/add', async (req, res) => {
 
     const city = new City({
       name,
-      image
+      image,
+      slug
     });
 
     await city.save();
@@ -92,7 +95,7 @@ router.post('/add', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { name, image } = req.body;
+    const { name, image , slug } = req.body;
 
     const city = await City.findById(req.params.id);
 
@@ -105,7 +108,7 @@ router.put('/:id', async (req, res) => {
 
     city.name = name || city.name;
     city.image = image || city.image;
-
+    city.slug = slug || city.slug;
     await city.save();
 
     res.status(200).json({

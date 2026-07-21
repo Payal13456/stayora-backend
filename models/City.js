@@ -10,6 +10,11 @@ const citySchema = new mongoose.Schema({
     type : String,
     required : false,
     nullable : true
+  },
+  slug : {
+    type : String,
+    required : true,
+    unique : true
   }
 });
 

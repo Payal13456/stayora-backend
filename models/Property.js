@@ -79,6 +79,11 @@ const propertySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
         required: true
+    },
+    slug : {
+        type : String,
+        required : true,
+        unique : true
     }
 }, {
     timestamps: true

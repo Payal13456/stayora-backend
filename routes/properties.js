@@ -23,7 +23,8 @@ router.get('/', async (req, res) => {
             genderPreference,
             minPrice,
             maxPrice,
-            user_id
+            user_id,
+            slug
         } = req.query;
 
         const filter = {};
@@ -44,6 +45,8 @@ router.get('/', async (req, res) => {
         }
 
         if (user_id) filter.user_id = user_id;
+
+        if (slug) filter.slug = slug;
 
         const properties = await Property.find(filter)
             .populate('city', 'name image')
