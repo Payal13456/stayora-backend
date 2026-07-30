@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Student = require("../models/Student");
+const IdDocument = require("../models/IdDocument");
 
 const router = express.Router();
 
@@ -54,6 +55,8 @@ router.post("/register", async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    const documents = await IdDocument.find({ studentId: student._id });
+
     res.status(201).json({
       success: true,
       message: "Student registered successfully",
@@ -64,6 +67,7 @@ router.post("/register", async (req, res) => {
         email: student.email,
         phone: student.phone,
         college: student.college,
+        documents: documents,
       },
     });
   } catch (error) {
@@ -118,6 +122,8 @@ router.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    const documents = await IdDocument.find({ studentId: student._id });
+
     res.json({
       success: true,
       message: "Login successful",
@@ -128,6 +134,7 @@ router.post("/login", async (req, res) => {
         email: student.email,
         phone: student.phone,
         college: student.college,
+        documents: documents,
       },
     });
   } catch (error) {

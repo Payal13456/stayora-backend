@@ -47,10 +47,15 @@ const studentSchema = new mongoose.Schema(
       },
     ],
 
-    type : {
+    type: {
       type: String,
       enum: ["student", "admin", "owner"],
       default: "student",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   {

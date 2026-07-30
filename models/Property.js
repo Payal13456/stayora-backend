@@ -1,92 +1,109 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const propertySchema = new mongoose.Schema({
+const propertySchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
 
     city: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'cities',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "cities",
+      required: true,
     },
 
     type: {
-        type: String,
-        enum: ['PG', 'HOSTEL', 'ROOM'],
-        required: true
+      type: String,
+      enum: ["PG", "HOSTEL", "ROOM"],
+      required: true,
     },
 
     genderPreference: {
-        type: String,
-        enum: ['Male', 'Female', 'Any'],
-        default: 'Any'
+      type: String,
+      enum: ["Male", "Female", "Any"],
+      default: "Any",
     },
 
     price: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
 
     description: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
 
     address: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
 
     latitude: {
-        type: Number,
-        default: null
+      type: Number,
+      default: null,
     },
 
     longitude: {
-        type: Number,
-        default: null
+      type: Number,
+      default: null,
     },
 
-    images: [{
-        type: String
-    }],
+    images: [
+      {
+        type: String,
+      },
+    ],
 
-    videos: [{
-        type: String
-    }],
+    videos: [
+      {
+        type: String,
+      },
+    ],
 
-    amenities: [{
-        type: String
-    }],
+    amenities: [
+      {
+        type: String,
+      },
+    ],
 
     ownerName: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
 
     ownerPhone: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
 
     isActive: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true,
     },
-    user_id : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
-        required: true
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
     },
-    slug : {
-        type : String,
-        required : true,
-        unique : true
-    }
-}, {
-    timestamps: true
-});
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model('Property', propertySchema);
+module.exports = mongoose.model("Property", propertySchema);

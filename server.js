@@ -1,8 +1,11 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
+
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/admin");
 const citiesRoutes = require("./routes/cities");
 const propertiesRoutes = require("./routes/properties");
 const roommateRoutes = require("./routes/roommate");
@@ -25,12 +28,13 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 app.use("/cities", citiesRoutes);
 app.use("/properties", propertiesRoutes);
 app.use("/roommate", roommateRoutes);
 app.use("/student", studentRoutes);
 app.use("/notifications", notificationsRoutes);
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
