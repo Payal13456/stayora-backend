@@ -34,7 +34,9 @@ app.use("/properties", propertiesRoutes);
 app.use("/roommate", roommateRoutes);
 app.use("/student", studentRoutes);
 app.use("/notifications", notificationsRoutes);
+app.use("/ai", require("./routes/aisearch"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

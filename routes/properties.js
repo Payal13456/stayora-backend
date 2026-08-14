@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
  */
 router.post('/add', async (req, res) => {
     try {
-        const slug = req.body.name.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
+        const slug = req.body.title.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
         req.body.slug = slug;
 
         const property = await Property.create(req.body);
