@@ -1,6 +1,6 @@
 const express = require('express');
 const Roommate = require('../models/Roommate');
-
+const auth = require("../middleware/auth");
 const router = express.Router();
 
 
@@ -51,7 +51,36 @@ router.post('/add', async (req, res) => {
 |
 */
 
-router.get('/', async (req, res) => {
+router.get("/my-list", async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId query parameter is required",
+      });
+    }
+
+    const roommates = await Roommate.find({ user_id: userId })
+      .populate("city", "name image slug")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: roommates.length,
+      data: roommates,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+router.get('/', auth , async (req, res) => {
   try {
     const {
       city,
