@@ -94,6 +94,9 @@ router.get('/', auth , async (req, res) => {
 
     const filter = {};
 
+    // show only list where user_id is not equal to logged in user id
+    filter.user_id = { $ne: req.user.id };
+
     if (city) filter.city = city;
 
     if (gender) filter.gender = gender;
