@@ -202,4 +202,33 @@ router.post("/upload-document", upload.single("document"), async (req, res) => {
     });
   }
 });
+
+router.get("/documents/:studentId", async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    
+    const documents = await IdDocument.find({ studentId });
+    
+    if (!documents || documents.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No documents found for this student",
+      });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      message: "Documents fetched successfully",
+      data: documents,
+    });
+  }
+  catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+
 module.exports = router;
