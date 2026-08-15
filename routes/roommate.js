@@ -304,4 +304,40 @@ router.patch('/:id/status', async (req, res) => {
   }
 });
 
+router.post("/delete", auth, async (req, res) => {
+  try {
+    const { roommateId } = req.body;
+    
+    const roommate = await Roommate.findById(roommateId);
+
+    if (!roommate) {
+      return res.status(404).json({
+        success: false,
+        message: "Roommate profile not found",
+      });
+    }
+
+    // Check if the logged-in user is the owner of the roommate profile
+    if (roommate.user_id.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this roommate profile",
+      });
+    }
+
+    await roommate.remove();
+
+    return res.status(200).json({
+      success: true,
+      message: "Roommate profile deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
 module.exports = router;
