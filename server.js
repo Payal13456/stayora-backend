@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -13,6 +14,27 @@ const studentRoutes = require("./routes/student");
 const notificationsRoutes = require("./routes/notifications");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: (origin, callback) => { 
+      const allowedOrigins = [
+        /^http:\/\/localhost:\d+$/,
+        /^http:\/\/127\.0\.0\.1:\d+$/,
+        /^https:\/\/.*\.vercel\.app$/,
+      ];
+
+      if (!origin || allowedOrigins.some((pattern) => pattern.test(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGO_URI;
