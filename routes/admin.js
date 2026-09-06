@@ -53,7 +53,7 @@ router.post("/verify-user", async (req, res) => {
       });
     }
 
-    const data = Student.findByIdAndUpdate(
+    const data = await Student.findByIdAndUpdate(
       userId,
       { verified: true },
       { new: true }
@@ -85,26 +85,17 @@ router.post("/verify-property", async (req, res) => {
       });
     }
 
-    Property.findByIdAndUpdate(
+    const updatedProperty = await Property.findByIdAndUpdate(
       propertyId,
       { isVerified: true },
-      { new: true },
-      (err, updatedProperty) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
-            success: false,
-            message: "Server error",
-          });
-        }
-
-        res.json({
-          success: true,
-          message: "Property verified successfully",
-          data: updatedProperty,
-        });
-      }
+      { new: true }
     );
+
+    res.json({
+      success: true,
+      message: "Property verified successfully",
+      data: updatedProperty,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -126,26 +117,17 @@ router.post("/mark-premium-property", async (req, res) => {
       });
     }
 
-    Property.findByIdAndUpdate(
+    const updatedProperty = await Property.findByIdAndUpdate(
       propertyId,
       { isPremium: true },
-      { new: true },
-      (err, updatedProperty) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
-            success: false,
-            message: "Server error",
-          });
-        }
-
-        res.json({
-          success: true,
-          message: "Property marked as premium successfully",
-          data: updatedProperty,
-        });
-      }
+      { new: true }
     );
+
+    res.json({
+      success: true,
+      message: "Property marked as premium successfully",
+      data: updatedProperty,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
