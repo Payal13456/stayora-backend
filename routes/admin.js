@@ -3,8 +3,43 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Student = require("../models/Student");
 const Property = require("../models/Property");
+const RegistrationTerms = require("../models/RegistrationTerms");
 
 const router = express.Router();
+
+router.post("/owner-registration-terms", async (req, res) => {
+  try {
+    const { title, content } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Terms and conditions content is required",
+      });
+    }
+
+    const terms = await RegistrationTerms.findOneAndUpdate(
+      { key: "owner_registration" },
+      {
+        key: "owner_registration",
+        title: title?.trim() || undefined,
+        content: content.trim(),
+      },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Owner registration terms saved successfully",
+      data: terms,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 
 router.post("/verify-user", async (req, res) => {
   try {
@@ -119,5 +154,6 @@ router.post("/mark-premium-property", async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;

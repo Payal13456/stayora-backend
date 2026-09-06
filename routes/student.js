@@ -1,10 +1,35 @@
 const express = require("express");
 const Student = require("../models/Student");
 const IdDocument = require("../models/IdDocument");
+const RegistrationTerms = require("../models/RegistrationTerms");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/uploadDocument");
 
 const router = express.Router();
+
+router.get("/owner-registration-terms", async (req, res) => {
+  try {
+    const terms = await RegistrationTerms.findOne({ key: "owner_registration" })
+      .select("title content updatedAt");
+
+    if (!terms) {
+      return res.status(404).json({
+        success: false,
+        message: "Owner registration terms not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: terms,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 
 /**
  * GET /api/student
