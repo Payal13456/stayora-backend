@@ -1,4 +1,4 @@
- express = require("express");
+const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Student = require("../models/Student");
@@ -62,7 +62,7 @@ router.post("/verify-user", async (req, res) => {
 
     const data = await Student.findByIdAndUpdate(
       userId,
-      { verified: true },
+      { isVerified: true },
       { new: true }
     );
 
@@ -143,6 +143,5 @@ router.post("/mark-premium-property", async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;
