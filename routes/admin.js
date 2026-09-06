@@ -87,7 +87,7 @@ router.post("/verify-property", async (req, res) => {
 
     Property.findByIdAndUpdate(
       propertyId,
-      { verified: true },
+      { isVerified: true },
       { new: true },
       (err, updatedProperty) => {
         if (err) {
