@@ -187,7 +187,7 @@ router.post("/upload-document", upload.single("document"), async (req, res) => {
     const document = await IdDocument.create({
       studentId,
       documentType,
-      documentUrl: `/uploads/documents/${req.file.filename}`,
+      documentUrl: `${(process.env.FRONTEND_URL || '').replace(/\/$/, '')}/uploads/documents/${req.file.filename}`,
     });
 
     return res.status(201).json({

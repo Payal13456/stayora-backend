@@ -6,6 +6,10 @@ const auth = require("../middleware/auth");
 const uploadPropertyMedia = require('../middleware/uploadPropertyMedia');
 
 const router = express.Router();
+const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+
+const getUploadedMediaUrl = filename =>
+    `${frontendUrl}/uploads/properties/${filename}`;
 
 /**
  * GET ALL PROPERTIES
@@ -79,8 +83,8 @@ router.post('/add', uploadPropertyMedia.fields([
         const slug = body.title.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
 
         body.slug = slug;
-        body.images = (req.files?.images || []).map(file => `/uploads/properties/${file.filename}`);
-        body.videos = (req.files?.videos || []).map(file => `/uploads/properties/${file.filename}`);
+        body.images = (req.files?.images || []).map(file => getUploadedMediaUrl(file.filename));
+        body.videos = (req.files?.videos || []).map(file => getUploadedMediaUrl(file.filename));
 
         const property = await Property.create(body);
 
@@ -113,11 +117,11 @@ router.put('/:id', uploadPropertyMedia.fields([
         const updates = { ...req.body };
 
         if (req.files?.images) {
-            updates.images = req.files.images.map(file => `/uploads/properties/${file.filename}`);
+            updates.images = req.files.images.map(file => getUploadedMediaUrl(file.filename));
         }
 
         if (req.files?.videos) {
-            updates.videos = req.files.videos.map(file => `/uploads/properties/${file.filename}`);
+            updates.videos = req.files.videos.map(file => getUploadedMediaUrl(file.filename));
         }
 
         const property = await Property.findByIdAndUpdate(
