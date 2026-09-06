@@ -3,6 +3,7 @@ const Property = require('../models/Property');
 const ScheduledVisit = require('../models/ScheduleVisit');
 const Notification = require('../models/Notification');
 const auth = require("../middleware/auth");
+const uploadPropertyMedia = require('../middleware/uploadPropertyMedia');
 
 const router = express.Router();
 
@@ -66,17 +67,22 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-
 /**
  * CREATE PROPERTY
  */
-router.post('/add', async (req, res) => {
+router.post('/add', uploadPropertyMedia.fields([
+    { name: 'images', maxCount: 15 },
+    { name: 'videos', maxCount: 5 }
+]), async (req, res) => {
     try {
-        const slug = req.body.title.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
-        req.body.slug = slug;
+        const body = { ...req.body };
+        const slug = body.title.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
 
-        const property = await Property.create(req.body);
+        body.slug = slug;
+        body.images = (req.files?.images || []).map(file => `/uploads/properties/${file.filename}`);
+        body.videos = (req.files?.videos || []).map(file => `/uploads/properties/${file.filename}`);
+
+        const property = await Property.create(body);
 
         const populatedProperty = await Property.findById(property._id)
             .populate('city', 'name image');
@@ -99,12 +105,24 @@ router.post('/add', async (req, res) => {
 /**
  * UPDATE PROPERTY
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', uploadPropertyMedia.fields([
+    { name: 'images', maxCount: 15 },
+    { name: 'videos', maxCount: 5 }
+]), async (req, res) => {
     try {
+        const updates = { ...req.body };
+
+        if (req.files?.images) {
+            updates.images = req.files.images.map(file => `/uploads/properties/${file.filename}`);
+        }
+
+        if (req.files?.videos) {
+            updates.videos = req.files.videos.map(file => `/uploads/properties/${file.filename}`);
+        }
 
         const property = await Property.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updates,
             {
                 new: true,
                 runValidators: true

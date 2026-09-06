@@ -27,10 +27,17 @@ router.post("/register", async (req, res) => {
     });
 
     if (existingStudent) {
-      return res.status(400).json({
-        success: false,
-        message: "Student already exists",
-      });
+      if(existingStudent.type == "owner"){
+        return res.status(400).json({
+          success: false,
+          message: "Owner already exists with this email or phone",
+        }); 
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Student already exists",
+        });
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
