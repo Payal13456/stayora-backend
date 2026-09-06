@@ -22,6 +22,7 @@ app.use(
         /^http:\/\/localhost:\d+$/,
         /^http:\/\/127\.0\.0\.1:\d+$/,
         /^https:\/\/.*\.vercel\.app$/,
+        /^https:\/\/(www\.)?myhomivo\.com$/,
       ];
 
       if (!origin || allowedOrigins.some((pattern) => pattern.test(origin))) {
