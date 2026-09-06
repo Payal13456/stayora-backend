@@ -255,5 +255,4 @@ router.get("/documents/:studentId", async (req, res) => {
   }
 });
 
-
 module.exports = router;

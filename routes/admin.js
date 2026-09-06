@@ -47,10 +47,17 @@ router.post("/verify-user", async (req, res) => {
 
     const student = await Student.findById(userId);
     if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found",
-      });
+      if(student.type == "owner") {
+        return res.status(400).json({
+          success: false,
+          message: "Owner not found",
+        }); 
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Student not found",
+        });
+      }
     }
 
     const data = await Student.findByIdAndUpdate(
